@@ -3,13 +3,14 @@
     "name": "godot-app",
     "slug": "godot-app",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "landscape",
     "icon": "./assets/images/icon.png",
     "scheme": "godotapp",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.jadhavakshay.godot-app"
     },
     "android": {
       "adaptiveIcon": {
