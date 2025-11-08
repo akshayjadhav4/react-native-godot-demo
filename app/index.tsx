@@ -3,21 +3,16 @@ import {
   RTNGodotView,
   runOnGodotThread,
 } from "@borndotcom/react-native-godot";
-import {
-  Dimensions,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-
+import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system/legacy";
 import { useEffect } from "react";
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
+
+const ACTION_JUMP = "ui_accept";
+const ACTION_MOVE_LEFT = "ui_left";
+const ACTION_MOVE_RIGHT = "ui_right";
 
 function initGodot() {
-  const { width, height } = Dimensions.get("window");
-
   runOnGodotThread(() => {
     "worklet";
     console.log("Initializing Godot");
@@ -46,27 +41,6 @@ function initGodot() {
         "--display-driver",
         "embedded",
       ]);
-    }
-
-    // Configure viewport after initialization
-    try {
-      const Godot = RTNGodot.API();
-      const engine = Godot.Engine;
-      const sceneTree = engine.get_main_loop();
-      const root = sceneTree.get_root();
-
-      // Set viewport to window size
-      root.set_size(Godot.Vector2i(Math.floor(width), Math.floor(height)));
-
-      // Configure content scaling mode
-      root.set_content_scale_mode(1); // CONTENT_SCALE_MODE_CANVAS_ITEMS
-      root.set_content_scale_aspect(1); // CONTENT_SCALE_ASPECT_KEEP
-
-      console.log(
-        `Godot viewport configured: ${Math.floor(width)}x${Math.floor(height)}`
-      );
-    } catch (error) {
-      console.error("Error configuring Godot viewport:", error);
     }
   });
 }
@@ -107,49 +81,36 @@ export default function Index() {
     <View style={styles.container}>
       <RTNGodotView style={styles.gameView} />
 
-      {/* Control Buttons - All on Left Side */}
+      {/* Left side controls - Direction buttons */}
       <View style={styles.leftControls}>
-        <View style={styles.movementRow}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              styles.leftButton,
-              pressed && styles.buttonPressed,
-            ]}
-            onPressIn={() => pressAction("ui_left")}
-            onPressOut={() => releaseAction("ui_left")}
-          >
-            <Text style={styles.buttonText}>◄</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              styles.rightButton,
-              pressed && styles.buttonPressed,
-            ]}
-            onPressIn={() => pressAction("ui_right")}
-            onPressOut={() => releaseAction("ui_right")}
-          >
-            <Text style={styles.buttonText}>►</Text>
-          </Pressable>
-        </View>
-
-        {/* Jump Button */}
-        <Pressable
-          style={({ pressed }) => [
-            styles.button,
-            styles.jumpButton,
-            pressed && styles.buttonPressed,
-          ]}
-          onPress={() => {
-            pressAction("ui_accept");
-            // Release after a short delay to simulate a key press
-            setTimeout(() => releaseAction("ui_accept"), 100);
-          }}
+        <TouchableOpacity
+          style={styles.button}
+          onPressIn={() => pressAction(ACTION_MOVE_LEFT)}
+          onPressOut={() => releaseAction(ACTION_MOVE_LEFT)}
+          activeOpacity={0.7}
         >
-          <Text style={styles.buttonText}>▲</Text>
-        </Pressable>
+          <Ionicons name="chevron-back" size={32} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPressIn={() => pressAction(ACTION_MOVE_RIGHT)}
+          onPressOut={() => releaseAction(ACTION_MOVE_RIGHT)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="chevron-forward" size={32} color="white" />
+        </TouchableOpacity>
+      </View>
+
+      {/* Right side controls - Jump button */}
+      <View style={styles.rightControls}>
+        <TouchableOpacity
+          style={[styles.button, styles.jumpButton]}
+          onPressIn={() => pressAction(ACTION_JUMP)}
+          onPressOut={() => releaseAction(ACTION_JUMP)}
+          activeOpacity={0.7}
+        >
+          <Ionicons name="arrow-up" size={36} color="white" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -161,49 +122,34 @@ const styles = StyleSheet.create({
   },
   gameView: {
     flex: 1,
-    padding: 0,
-    margin: 0,
   },
   leftControls: {
     position: "absolute",
-    bottom: 30,
-    left: 20,
-    gap: 8,
-  },
-  movementRow: {
+    bottom: 40,
+    left: 30,
     flexDirection: "row",
-    gap: 8,
+    gap: 20,
+  },
+  rightControls: {
+    position: "absolute",
+    bottom: 40,
+    right: 30,
   },
   button: {
-    backgroundColor: "rgba(0, 122, 255, 0.8)",
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    alignItems: "center",
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    minWidth: 50,
-    minHeight: 50,
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
-  buttonPressed: {
-    backgroundColor: "rgba(0, 122, 255, 1)",
-    transform: [{ scale: 0.95 }],
-  },
-  leftButton: {},
-  rightButton: {},
   jumpButton: {
-    backgroundColor: "rgba(255, 59, 48, 0.8)",
-  },
-  buttonText: {
-    color: "white",
-    fontSize: 20,
-    fontWeight: "bold",
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: "rgba(220, 38, 38, 0.7)",
+    borderColor: "rgba(255, 255, 255, 0.4)",
   },
 });
