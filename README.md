@@ -12,13 +12,11 @@ This project demonstrates:
 - **Custom Expo Plugin**: Automatic handling of Godot `.pck` files for iOS builds
 
 ## 📸 Screenshots
+  <img src="demo/1.PNG"  alt="Screenshot 1" />
+  <img src="demo/2.PNG"  alt="Screenshot 2" />
+  <img src="demo/3.PNG"  alt="Screenshot 3" />
+  <img src="demo/4.PNG"  alt="Screenshot 4" />
 
-<p align="center">
-  <img src="demo/1.PNG" width="200" alt="Screenshot 1" />
-  <img src="demo/2.PNG" width="200" alt="Screenshot 2" />
-  <img src="demo/3.PNG" width="200" alt="Screenshot 3" />
-  <img src="demo/4.PNG" width="200" alt="Screenshot 4" />
-</p>
 
 ## 🚀 Getting Started
 
