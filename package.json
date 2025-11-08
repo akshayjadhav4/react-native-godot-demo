@@ -8,7 +8,9 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "build:plugin": "tsc --build plugin/tsconfig.json",
+    "postinstall": "pnpm run build:plugin"
   },
   "dependencies": {
     "@borndotcom/react-native-godot": "^1.0.1",
@@ -40,9 +42,11 @@
     "react-native-worklets": "0.5.1"
   },
   "devDependencies": {
+    "@types/node": "^20.0.0",
     "@types/react": "~19.1.0",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
+    "expo-module-scripts": "^2.1.1",
     "typescript": "~5.9.2"
   },
   "private": true

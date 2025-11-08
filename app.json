@@ -39,7 +39,8 @@
             "backgroundColor": "#000000"
           }
         }
-      ]
+      ],
+      "./app.plugin.js"
     ],
     "experiments": {
       "typedRoutes": true,
