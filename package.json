@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "build:plugin": "tsc --build plugin/tsconfig.json",
+    "download-prebuilt": "download-prebuilt",
     "postinstall": "pnpm run build:plugin"
   },
   "dependencies": {
