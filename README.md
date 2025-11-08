@@ -1,50 +1,182 @@
-# Welcome to your Expo app 👋
+# React Native Godot + Expo Demo
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A demonstration project showing how to integrate [React Native Godot](https://github.com/borndotcom/react-native-godot) by `borndotcom` with [Expo](https://expo.dev). This project showcases embedding the Godot Engine into an Expo React Native application with custom touch controls and game interaction.
 
-## Get started
+## 🎮 What is this?
 
-1. Install dependencies
+This project demonstrates:
+- **Godot Engine Integration**: Running Godot games within an Expo app
+- **Cross-Platform Support**: Works on both iOS and Android
+- **Custom Controls**: Touch-based game controls overlaid on the Godot view
+- **Godot API Access**: Direct interaction with Godot's Input system from React Native
+- **Custom Expo Plugin**: Automatic handling of Godot `.pck` files for iOS builds
 
-   ```bash
-   npm install
-   ```
+## 📸 Screenshots
 
-2. Start the app
+<p align="center">
+  <img src="demo/1.PNG" width="200" alt="Screenshot 1" />
+  <img src="demo/2.PNG" width="200" alt="Screenshot 2" />
+  <img src="demo/3.PNG" width="200" alt="Screenshot 3" />
+  <img src="demo/4.PNG" width="200" alt="Screenshot 4" />
+</p>
 
-   ```bash
-   npx expo start
-   ```
+## 🚀 Getting Started
 
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
+### 1. Install Dependencies
 
 ```bash
-npm run reset-project
+pnpm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+```bash
+pnpm run download-prebuilt
+```
 
-## Learn more
+This will also automatically build the custom Expo config plugin.
 
-To learn more about developing your project with Expo, look at the following resources:
+### 2. Add Your Godot Game
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Place your exported Godot game file at:
 
-## Join the community
+```
+assets/godot/main.pck
+```
 
-Join our community of developers creating universal apps.
+**Note**: The included `main.pck` is a sample platformer game. Replace it with your own Godot game export.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+### 3. Run on iOS
+
+```bash
+pnpm ios
+```
+
+The custom Expo plugin will automatically copy the `.pck` file to the iOS project and add it to Xcode resources.
+
+
+## 📁 Project Structure
+
+```
+godot-app/
+├── app/                      # Main application screens
+│   ├── index.tsx            # Home screen with Godot integration
+│   └── _layout.tsx          # Navigation layout
+├── assets/
+│   └── godot/
+│       └── main.pck         # Godot game package file
+├── plugin/                   # Custom Expo config plugin
+│   └── src/
+│       ├── index.ts         # Plugin entry point
+│       └── withPckFile.ts   # iOS .pck file integration
+├── app.plugin.js            # Plugin configuration
+└── app.json                 # Expo configuration
+```
+
+## 🎯 Key Features
+
+### Custom Game Controls
+
+The demo includes touch controls that interact with the Godot game:
+
+- **Left Arrow**: Move left (`ui_left` action)
+- **Right Arrow**: Move right (`ui_right` action)
+- **Jump Button**: Jump (`ui_accept` action)
+
+These controls use Godot's Input API through worklets for thread-safe communication.
+
+### Custom Expo Config Plugin
+
+The project includes a custom Expo plugin (`plugin/src/withPckFile.ts`) that:
+- Automatically copies `main.pck` from assets to the iOS project
+- Adds the file to Xcode project resources
+- Ensures proper build configuration for iOS
+
+## 🔧 Configuration
+
+### App Configuration (`app.json`)
+
+Key settings:
+- **Orientation**: Set to `landscape` for game display
+- **Custom Plugin**: Configured to handle Godot assets
+
+## 🎮 How It Works
+
+### 1. Godot Thread Execution
+
+All Godot operations run on a dedicated thread using worklets:
+
+```typescript
+runOnGodotThread(() => {
+  'worklet';
+  const Godot = RTNGodot.API();
+  // Godot operations here
+});
+```
+
+### 2. Input Handling
+
+The app demonstrates sending input events to Godot:
+
+```typescript
+function pressAction(action: string) {
+  runOnGodotThread(() => {
+    'worklet';
+    const Godot = RTNGodot.API();
+    const Input = Godot.Input;
+    Input.action_press(action);
+  });
+}
+```
+
+### 3. View Integration
+
+The Godot view is embedded as a React Native component:
+
+```typescript
+<RTNGodotView style={styles.gameView} />
+```
+
+## 📱 Platform-Specific Notes
+
+### iOS
+- Game file is bundled as `main.pck` in the app bundle
+- Custom Expo plugin handles Xcode project integration
+- File accessed via `FileSystem.bundleDirectory`
+
+## 📚 Resources
+
+### Make simple game with Godot
+- [Godot Beginner Tutorial](https://youtu.be/LOhfqjmasi0?si=EGMVRKSGOUvXUVnJ)
+
+### React Native Godot
+- [GitHub Repository](https://github.com/borndotcom/react-native-godot)
+
+## 🎨 Game Assets & Credits
+
+The demo platformer game included in this project uses assets from the Brackeys Godot tutorial. All assets have been repackaged and many have been modified by Brackeys.
+
+### License
+
+**Creative Commons Zero (CC0)** - Free to use for any purpose
+
+### Credits
+
+**Sprites by analogStudios_:**
+- Knight - [Camelot Pack](https://analogstudios.itch.io/camelot)
+- Slime - [Dungeon Sprites](https://analogstudios.itch.io/dungeonsprites)
+- Platforms and Coin - [Four Seasons Platformer Sprites](https://analogstudios.itch.io/four-seasons-platformer-sprites)
+
+**Sprites by RottingPixels:**
+- World Tileset and Fruit - [Four Seasons Platformer Tileset](https://rottingpixels.itch.io/four-seasons-platformer-tileset-16x16free)
+
+**Sounds:**
+- Brackeys, Asbjørn Thirslund
+
+**Music:**
+- Brackeys, Sofia Thirslund
+
+**Fonts by Jayvee Enaguas (HarvettFox96):**
+- [Pixel Operator](https://www.dafont.com/pixel-operator.font?l[]=10&l[]=1)
+
+---
+
+Built with ❤️ using [React Native Godot](https://github.com/borndotcom/react-native-godot) and [Expo](https://expo.dev)
