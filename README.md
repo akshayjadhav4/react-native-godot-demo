@@ -20,20 +20,30 @@ This project demonstrates:
 
 ## 🚀 Getting Started
 
-### 1. Install Dependencies
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/akshayjadhav4/react-native-godot-demo.git
+cd react-native-godot-demo
+```
+
+### 2. Install Dependencies
 
 ```bash
 pnpm install
 ```
 
+### 3. Download LibGodot Prebuilt Libraries
+
 ```bash
 pnpm run download-prebuilt
 ```
-This way React Native Godot can be updated independently from LibGodot, and also local, customized builds of LibGodot are supported.
 
-Also automatically build the custom Expo config plugin.
+This downloads the prebuilt LibGodot packages required by React Native Godot. This way React Native Godot can be updated independently from LibGodot, and also local, customized builds of LibGodot are supported.
 
-### 2. Add Your Godot Game
+The install command will also automatically build the custom Expo config plugin.
+
+### 4. Add Your Godot Game (Optional)
 
 Place your exported Godot game file at:
 
@@ -43,13 +53,15 @@ assets/godot/main.pck
 
 **Note**: The included `main.pck` is a sample platformer game. Replace it with your own Godot game export.
 
-### 3. Run on iOS
+### 5. Run on iOS
 
 ```bash
+npx expo prebuild --platform ios --clean
 pnpm ios
 ```
 
 The custom Expo plugin will automatically copy the `.pck` file to the iOS project and add it to Xcode resources.
+
 
 
 ## 📁 Project Structure
