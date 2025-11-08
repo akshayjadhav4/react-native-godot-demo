@@ -31,8 +31,9 @@ pnpm install
 ```bash
 pnpm run download-prebuilt
 ```
+This way React Native Godot can be updated independently from LibGodot, and also local, customized builds of LibGodot are supported.
 
-This will also automatically build the custom Expo config plugin.
+Also automatically build the custom Expo config plugin.
 
 ### 2. Add Your Godot Game
 
