@@ -20,7 +20,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.jadhavakshay.godotapp"
     },
     "web": {
       "output": "static",
@@ -40,7 +41,17 @@
           }
         }
       ],
-      "./app.plugin.js"
+      "./app.plugin.js",
+      [
+        "expo-build-properties", {
+        "android": {
+          "minSdkVersion": 29,
+          "extraMavenRepos": [
+            "../../node_modules/@borndotcom/react-native-godot/android/libs/libgodot-android/4.5.1.migeran.2"
+          ]
+        }
+      }
+    ]
     ],
     "experiments": {
       "typedRoutes": true,
