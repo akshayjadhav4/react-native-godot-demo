@@ -9,7 +9,7 @@ This project demonstrates:
 - **Cross-Platform Support**: Works on both iOS and Android
 - **Custom Controls**: Touch-based game controls overlaid on the Godot view
 - **Godot API Access**: Direct interaction with Godot's Input system from React Native
-- **Custom Expo Plugin**: Automatic handling of Godot `.pck` files for iOS builds
+- **Custom Expo Plugin**: Automatic handling of Godot files for both iOS and Android builds
 
 ## 📸 Screenshots
   <img src="demo/1.PNG"  alt="Screenshot 1" />
@@ -45,13 +45,25 @@ The install command will also automatically build the custom Expo config plugin.
 
 ### 4. Add Your Godot Game (Optional)
 
+#### For iOS:
 Place your exported Godot game file at:
 
 ```
 assets/godot/main.pck
 ```
 
-**Note**: The included `main.pck` is a sample platformer game. Replace it with your own Godot game export.
+#### For Android:
+Place your exported Godot game files as a folder structure at:
+
+```
+assets/godot/godot-files/main/
+```
+
+**Why different formats?**
+- **iOS**: Uses a `.pck` (pack) file because there's no performance limitation when accessing pack files from the app bundle. The pack file is more efficient and easier to manage.
+- **Android**: Requires files as a folder structure because accessing pack file contents from the main package is much slower on Android. Storing files as individual files in the asset folder provides better performance.
+
+**Note**: The included files are for a sample platformer game. Replace them with your own Godot game export.
 
 ### 5. Run on iOS
 
@@ -60,7 +72,16 @@ npx expo prebuild --platform ios --clean
 pnpm ios
 ```
 
-The custom Expo plugin will automatically copy the `.pck` file to the iOS project and add it to Xcode resources.
+The custom Expo plugin will automatically copy the `main.pck` file to the iOS project and add it to Xcode resources.
+
+### 6. Run on Android
+
+```bash
+npx expo prebuild --platform android --clean
+pnpm android
+```
+
+The custom Expo plugin will automatically copy the Godot files from `assets/godot/godot-files/main/` to `android/app/src/main/assets/main/` during the prebuild process.
 
 
 
@@ -73,11 +94,14 @@ godot-app/
 │   └── _layout.tsx          # Navigation layout
 ├── assets/
 │   └── godot/
-│       └── main.pck         # Godot game package file
+│       ├── main.pck         # Godot game package file (iOS)
+│       └── godot-files/     # Godot game files folder (Android)
+│           └── main/        # Unpacked game files for Android
 ├── plugin/                   # Custom Expo config plugin
 │   └── src/
 │       ├── index.ts         # Plugin entry point
-│       └── withPckFile.ts   # iOS .pck file integration
+│       ├── withPckFile.ts   # iOS .pck file integration
+│       └── withGodotFiles.ts # Android files integration
 ├── app.plugin.js            # Plugin configuration
 └── app.json                 # Expo configuration
 ```
@@ -96,10 +120,20 @@ These controls use Godot's Input API through worklets for thread-safe communicat
 
 ### Custom Expo Config Plugin
 
-The project includes a custom Expo plugin (`plugin/src/withPckFile.ts`) that:
-- Automatically copies `main.pck` from assets to the iOS project
+The project includes custom Expo plugins that handle platform-specific Godot file integration:
+
+**iOS Plugin** (`plugin/src/withPckFile.ts`):
+- Automatically copies `main.pck` from `assets/godot/` to the iOS project root
 - Adds the file to Xcode project resources
 - Ensures proper build configuration for iOS
+
+**Android Plugin** (`plugin/src/withGodotFiles.ts`):
+- Automatically copies Godot files from `assets/godot/godot-files/main/` to `android/app/src/main/assets/main/`
+- Recursively copies all files and subdirectories
+- Ensures the assets directory exists before copying
+- Runs during the `expo prebuild` process
+
+Both plugins are configured in `app.plugin.js` and run automatically when you execute `npx expo prebuild`.
 
 ## 🔧 Configuration
 
@@ -150,8 +184,16 @@ The Godot view is embedded as a React Native component:
 
 ### iOS
 - Game file is bundled as `main.pck` in the app bundle
-- Custom Expo plugin handles Xcode project integration
-- File accessed via `FileSystem.bundleDirectory`
+- Custom Expo plugin (`withPckFile.ts`) handles Xcode project integration
+- File accessed via `FileSystem.bundleDirectory + "main.pck"`
+- Godot instance initialized with `--main-pack` parameter pointing to the `.pck` file
+
+### Android
+- Game files are stored as individual files in `android/app/src/main/assets/main/`
+- Custom Expo plugin (`withGodotFiles.ts`) automatically copies files from `assets/godot/godot-files/main/` during prebuild
+- Files must be in folder structure (not `.pck`) because accessing pack file contents from the main package is much slower on Android
+- Godot instance initialized with `--path /main` parameter pointing to the assets directory
+- The plugin recursively copies all files and subdirectories to ensure the complete game structure is available
 
 ## 📚 Resources
 
