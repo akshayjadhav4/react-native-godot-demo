@@ -33,7 +33,14 @@ cd react-native-godot-demo
 pnpm install
 ```
 
-### 3. Download LibGodot Prebuilt Libraries
+This will automatically:
+- Download LibGodot prebuilt libraries
+- Apply the Android patch (see [Android Patch Note](#android-patch-note) below)
+- Build the custom Expo config plugin
+
+### 3. Download LibGodot Prebuilt Libraries (Optional)
+
+**Note**: This step is automatically executed during `pnpm install` (step 2). You only need to run this manually if you want to update or re-download the libraries.
 
 ```bash
 pnpm run download-prebuilt
@@ -41,9 +48,31 @@ pnpm run download-prebuilt
 
 This downloads the prebuilt LibGodot packages required by React Native Godot. This way React Native Godot can be updated independently from LibGodot, and also local, customized builds of LibGodot are supported.
 
-The install command will also automatically build the custom Expo config plugin.
+### 4. Configure Android Build Properties (Required for Android)
 
-### 4. Add Your Godot Game (Optional)
+This project uses `expo-build-properties` to configure Android-specific settings. The configuration is already set up in `app.json`, but ensure it includes:
+
+```json
+[
+  "expo-build-properties",
+  {
+    "android": {
+      "minSdkVersion": 29,
+      "extraMavenRepos": [
+        "../../node_modules/@borndotcom/react-native-godot/android/libs/libgodot-android/4.5.1.migeran.2"
+      ]
+    }
+  }
+]
+```
+
+This configuration:
+- Sets the minimum Android SDK version to 29
+- Adds the LibGodot Maven repository path for Android builds
+
+**Note**: This is already configured in the project's `app.json` file.
+
+### 5. Add Your Godot Game (Optional)
 
 #### For iOS:
 Place your exported Godot game file at:
@@ -65,7 +94,7 @@ assets/godot/godot-files/main/
 
 **Note**: The included files are for a sample platformer game. Replace them with your own Godot game export.
 
-### 5. Run on iOS
+### 6. Run on iOS
 
 ```bash
 npx expo prebuild --platform ios --clean
@@ -74,7 +103,7 @@ pnpm ios
 
 The custom Expo plugin will automatically copy the `main.pck` file to the iOS project and add it to Xcode resources.
 
-### 6. Run on Android
+### 7. Run on Android
 
 ```bash
 npx expo prebuild --platform android --clean
@@ -82,6 +111,17 @@ pnpm android
 ```
 
 The custom Expo plugin will automatically copy the Godot files from `assets/godot/godot-files/main/` to `android/app/src/main/assets/main/` during the prebuild process.
+
+#### Android Patch Note
+
+This project includes a patch for `@borndotcom/react-native-godot@1.0.1` located in `patches/@borndotcom__react-native-godot.patch`. The patch fixes Android crashes that occur when using Expo with the new React Native architecture (Arc). 
+
+The patch ensures proper JNI initialization by setting the JavaVM pointer in LibGodot before initialization, which is critical for Android thread creation. The patch is automatically applied during `pnpm install` via `patch-package`.
+
+If you encounter crashes on Android, ensure the patch is applied by running:
+```bash
+pnpm install
+```
 
 
 
@@ -97,6 +137,8 @@ godot-app/
 │       ├── main.pck         # Godot game package file (iOS)
 │       └── godot-files/     # Godot game files folder (Android)
 │           └── main/        # Unpacked game files for Android
+├── patches/                  # Patch files for dependencies
+│   └── @borndotcom__react-native-godot.patch  # Android crash fix patch
 ├── plugin/                   # Custom Expo config plugin
 │   └── src/
 │       ├── index.ts         # Plugin entry point
@@ -141,7 +183,22 @@ Both plugins are configured in `app.plugin.js` and run automatically when you ex
 
 Key settings:
 - **Orientation**: Set to `landscape` for game display
-- **Custom Plugin**: Configured to handle Godot assets
+- **Custom Plugin**: Configured to handle Godot assets for both iOS and Android
+- **Android Build Properties**: Configured with `expo-build-properties` plugin:
+  ```json
+  [
+    "expo-build-properties",
+    {
+      "android": {
+        "minSdkVersion": 29,
+        "extraMavenRepos": [
+          "../../node_modules/@borndotcom/react-native-godot/android/libs/libgodot-android/4.5.1.migeran.2"
+        ]
+      }
+    }
+  ]
+  ```
+  This ensures the LibGodot Android library is accessible during the build process.
 
 ## 🎮 How It Works
 
@@ -194,6 +251,8 @@ The Godot view is embedded as a React Native component:
 - Files must be in folder structure (not `.pck`) because accessing pack file contents from the main package is much slower on Android
 - Godot instance initialized with `--path /main` parameter pointing to the assets directory
 - The plugin recursively copies all files and subdirectories to ensure the complete game structure is available
+- **Patch Required**: A patch is applied to `@borndotcom/react-native-godot@1.0.1` to fix crashes on Android Expo (likely due to new React Native architecture). The patch is in `patches/@borndotcom__react-native-godot.patch` and is automatically applied during installation
+- **Build Configuration**: Requires `expo-build-properties` plugin with `minSdkVersion: 29` and LibGodot Maven repository path configured (see [Configuration](#-configuration) section)
 
 ## 📚 Resources
 
