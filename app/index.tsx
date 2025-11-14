@@ -5,7 +5,7 @@ import {
 } from "@borndotcom/react-native-godot";
 import { Ionicons } from "@expo/vector-icons";
 import * as FileSystem from "expo-file-system/legacy";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
 
 const ACTION_JUMP = "ui_accept";
@@ -72,14 +72,41 @@ function releaseAction(action: string) {
 }
 
 export default function Index() {
+  const [isPaused, setIsPaused] = useState(false);
+
   useEffect(() => {
     initGodot();
     return () => {};
   }, []);
 
+  const handlePlayPause = () => {
+    if (isPaused) {
+      RTNGodot.resume();
+      setIsPaused(false);
+    } else {
+      RTNGodot.pause();
+      setIsPaused(true);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <RTNGodotView style={styles.gameView} />
+
+      {/* Top corner - Play/Pause button */}
+      <View style={styles.topControls}>
+        <TouchableOpacity
+          style={styles.playPauseButton}
+          onPress={handlePlayPause}
+          activeOpacity={0.7}
+        >
+          <Ionicons
+            name={isPaused ? "play" : "pause"}
+            size={28}
+            color="white"
+          />
+        </TouchableOpacity>
+      </View>
 
       {/* Left side controls - Direction buttons */}
       <View style={styles.leftControls}>
@@ -122,6 +149,21 @@ const styles = StyleSheet.create({
   },
   gameView: {
     flex: 1,
+  },
+  topControls: {
+    position: "absolute",
+    top: 40,
+    right: 30,
+  },
+  playPauseButton: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    justifyContent: "center",
+    alignItems: "center",
+    borderWidth: 3,
+    borderColor: "rgba(255, 255, 255, 0.3)",
   },
   leftControls: {
     position: "absolute",
